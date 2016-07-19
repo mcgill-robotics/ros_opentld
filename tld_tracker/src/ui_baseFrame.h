@@ -50,6 +50,7 @@ public:
     QPushButton *stop_tracking_button;
     QPushButton *background_reset_button;
     QPushButton *reset_button;
+    QPushButton *force_button;
 
     void setupUi(QWidget *BaseFrame)
     {
@@ -148,6 +149,11 @@ public:
 
         verticalLayout->addWidget(reset_button);
 
+        force_button = new QPushButton(BaseFrame);
+        force_button->setObjectName(QString::fromUtf8("force_button"));
+
+        verticalLayout->addWidget(force_button);
+
 
         horizontalLayout->addLayout(verticalLayout);
 
@@ -170,6 +176,7 @@ public:
         stop_tracking_button->setText(QApplication::translate("BaseFrame", "Start/Stop tracking", 0, QApplication::UnicodeUTF8));
         background_reset_button->setText(QApplication::translate("BaseFrame", "Reset background", 0, QApplication::UnicodeUTF8));
         reset_button->setText(QApplication::translate("BaseFrame", "Reset", 0, QApplication::UnicodeUTF8));
+        force_button->setText(QApplication::translate("BaseFrame", "Force", 0, QApplication::UnicodeUTF8));
     } // retranslateUi
 
 };

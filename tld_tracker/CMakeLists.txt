@@ -23,19 +23,6 @@ set(OPENTLD_OUTPUT_DIR ${CMAKE_LIBRARY_OUTPUT_DIRECTORY}/../)
 
 include(ExternalProject)
 
-externalproject_add(opentld
-  PREFIX libopentld
-  SVN_REPOSITORY  https://github.com/Ronan0912/OpenTLD/trunk/
-  SVN_REVISION    -rHEAD
-  PATCH_COMMAND   patch -p0 -i ${PROJECT_SOURCE_DIR}/opentld/patches/diff1.patch
-                  &&
-                  patch -p0 -i ${PROJECT_SOURCE_DIR}/opentld/patches/diff2.patch
-  BUILD_IN_SOURCE 1
-  BUILD_COMMAND   cmake --build .
-  INSTALL_COMMAND ${PROJECT_SOURCE_DIR}/opentld/install.sh
-                  ${OPENTLD_OUTPUT_DIR}
-)
-
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html

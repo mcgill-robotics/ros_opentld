@@ -82,6 +82,7 @@ class BaseFrame : public QWidget, private Ui::BaseFrame
 		void export_model();
 		void import_model();
 		void reset();
+		void force_new_BB();
 };
 
 #endif

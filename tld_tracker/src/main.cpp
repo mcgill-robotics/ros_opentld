@@ -21,6 +21,8 @@
  *
  *  Created on: June 8, 2012
  *      Author: Ronan Chauvin
+ *  Modified on: June 28, 2016
+ *      Modifiers: Alex Smith, Alexander Chatron-Michaud, McGill Robotics
  */
 
 #include "main.hpp"
@@ -29,6 +31,7 @@
 #include <sensor_msgs/image_encodings.h>
 
 namespace enc = sensor_msgs::image_encodings;
+bool forcing = false;
 
 void Main::process()
 {
@@ -43,6 +46,7 @@ void Main::process()
         switch (state)
         {
             case INIT:
+                ROS_INFO("Loaded NNet successfully");
                 if(newImageReceived())
                 {
                     if(showOutput)
@@ -59,6 +63,7 @@ void Main::process()
                 if(loadModel && !modelImportFile.empty())
                 {
                     ROS_INFO("Loading model %s", modelImportFile.c_str());
+		                ROS_INFO("Loaded NNet from /DATA/NN_model.pkl and attached to %s", modelImportFile.c_str());
 
                     tld->readFromFile(modelImportFile.c_str());
                     tld->learningEnabled = false;
@@ -86,7 +91,7 @@ void Main::process()
                     ROS_INFO("Waiting for a BB");
                 }
                 break;
-                  case TRACKING:
+            case TRACKING:
                 if(newImageReceived())
                 {
                   ros::Time tic = ros::Time::now();
@@ -114,10 +119,42 @@ void Main::process()
                   }
                 }
                 break;
-                  case STOPPED:
-                    ros::Duration(1.0).sleep();
-                    ROS_INFO("Tracker stopped");
+            case STOPPED:
+                ros::Duration(1.0).sleep();
+                ROS_INFO("Tracker stopped");
                 break;
+            case FORCE:
+            	if(correctBB)
+                {
+                    target_image = gray;
+                    target_bb = faceDetection();
+
+                    sendTrackedObject(target_bb.x,target_bb.y,target_bb.width,target_bb.height,1.0);
+
+                    ROS_INFO("Added BB at %d %d %d %d\n", target_bb.x, target_bb.y, target_bb.width, target_bb.height);
+
+                    tld->selectObject(target_image, &target_bb);
+                    tld->learningEnabled = true;
+                    state = TRACKING;
+                }
+                else
+                {
+                    ros::Duration(1.0).sleep();
+                    ROS_INFO("Waiting for forced BB");
+                }
+                break;
+            case FORCE_INIT:
+            	if(newImageReceived()){
+            		if(showOutput)
+                        sendTrackedObject(0, 0, 0, 0, 0.0);
+                    getLastImageFromBuffer();
+                    tld->detectorCascade->imgWidth = gray.cols;
+                    tld->detectorCascade->imgHeight = gray.rows;
+                    tld->detectorCascade->imgWidthStep = gray.step;
+
+                    state = FORCE;
+            	}
+            	break;
                   default:
                 break;
                 }
@@ -166,12 +203,13 @@ void Main::process()
 
     void Main::targetReceivedCB(const tld_msgs::TargetConstPtr & msg)
     {
-      reset();
+      if (!forcing) {reset();} 
+      	
       ROS_ASSERT(msg->bb.x >= 0);
       ROS_ASSERT(msg->bb.y >= 0);
       ROS_ASSERT(msg->bb.width > 0);
       ROS_ASSERT(msg->bb.height > 0);
-      ROS_INFO("Bounding Box received");
+      ROS_INFO("Bounding Box received. Reset has been called.");
 
       target_bb.x = msg->bb.x;
       target_bb.y = msg->bb.y;
@@ -215,6 +253,9 @@ void Main::process()
           break;
         case 'r':
           reset();
+          break;
+        case 'f':
+          forceNewBB();
           break;
         default:
           break;
@@ -306,6 +347,13 @@ void Main::process()
     {
       correctBB = false;
       state = INIT;
+    }
+
+    void Main::forceNewBB()
+    {
+      correctBB = false;
+      forcing = true;
+      state = FORCE_INIT;
     }
 
     cv::Rect Main::faceDetection()

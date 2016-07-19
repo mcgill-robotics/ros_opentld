@@ -14,6 +14,7 @@ The ROS implementation consists of two nodes : the tracker node which use the op
 * `e` export model
 * `i` import model
 * `r` clear model
+* `f` force a new bounding box on the model (not yet functioning)
 
 In the two launch files, you can configure the input video stream. In the tracker launch file, you can configure the bounding box source, the default bounding box if there is one, the model that you may want to load and its path, the automatic face detection by the OpenCV cascade classifier and some others parameters.
 

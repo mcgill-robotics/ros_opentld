@@ -21,6 +21,8 @@
  *
  *  Created on: May 17, 2012
  *      Author: Ronan Chauvin
+ *  Modified on: June 28, 2016
+ *      Modifier: Alex Smith, McGill Robotics
  */
 
 #include "base_frame.hpp"
@@ -47,6 +49,7 @@ BaseFrame::BaseFrame()
 	QObject::connect(importing_button,SIGNAL(clicked()),this,SLOT(import_model()));
 	QObject::connect(exporting_button,SIGNAL(clicked()),this,SLOT(export_model()));
 	QObject::connect(reset_button,SIGNAL(clicked()),this,SLOT(reset()));
+	QObject::connect(force_button,SIGNAL(clicked()),this,SLOT(force_new_BB()));
 
 	sub1 = n.subscribe("image", 1000, &BaseFrame::image_receivedCB, this);
 	sub2 = n.subscribe("tracked_object", 1000, &BaseFrame::tracked_objectCB, this);
@@ -109,6 +112,9 @@ void BaseFrame::keyPressEvent(QKeyEvent * event)
 			break;
 		case Qt::Key_F5:
 			first_image = true;
+		case Qt::Key_F:
+			force_new_BB();
+			break;
 		default:
 			event->ignore();
 			break;
@@ -244,4 +250,12 @@ void BaseFrame::reset()
 	cmd.data = 'r';
 	pub2.publish(cmd);
 	qDebug() << "Reset";
+}
+
+
+void BaseFrame::force_new_BB(){
+	std_msgs::Char cmd;
+	cmd.data = 'f';
+	pub2.publish(cmd);
+	qDebug() << "Forcing";
 }
