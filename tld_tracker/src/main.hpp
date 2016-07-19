@@ -104,6 +104,7 @@ class Main
 		bool showOutput;
 		bool exportModelAfterRun;
 		bool loadModel;
+		std::string import_filename = "DATA/NN_model.pkl";
 		bool autoFaceDetection;
 		std::string modelImportFile;
 		std::string modelExportFile;
@@ -113,10 +114,13 @@ class Main
 			INIT,
 			TRACKER_INIT,
 			TRACKING,
-			STOPPED
+			STOPPED,
+			FORCE,
+			FORCE_INIT
 		} state;
 
 		bool correctBB;
+		bool forcing;
 		cv::Rect target_bb;
 		cv::Mat target_image;
 
@@ -175,6 +179,7 @@ class Main
 		void exportModel();
 		void importModel();
 		void reset();
+		void forceNewBB();
 
         /*!
         * \brief This function allows to automatically initialize the target 
