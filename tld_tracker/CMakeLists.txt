@@ -25,7 +25,7 @@ include(ExternalProject)
 
 externalproject_add(opentld
   PREFIX libopentld
-  SVN_REPOSITORY  https://github.com/Ronan0912/OpenTLD/trunk/
+  SVN_REPOSITORY  https://github.com/GabrielAlacchi/OpenTLD/trunk
   SVN_REVISION    -rHEAD
   PATCH_COMMAND   patch -p0 -i ${PROJECT_SOURCE_DIR}/opentld/patches/diff1.patch
                   &&
